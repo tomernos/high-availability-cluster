@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  webz-001:
+    build: 
+      context: ./webz-001
+      dockerfile: Dockerfile  
+    container_name: webz-001
+    hostname: webz-001
+    networks:
+      cluster_net:
+        ipv4_address: 172.20.0.2
+    privileged: true
+    environment:
+      - TZ=Asia/Jerusalem
+    tty: true
+    cap_add:
+      - NET_ADMIN
+
+  webz-002:
+    build: 
+      context: ./webz-002
+      dockerfile: Dockerfile  
+    image: webz-002:latest
+    container_name: webz-002
+    hostname: webz-002
+    networks:
+      cluster_net:
+        ipv4_address: 172.20.0.3
+    privileged: true
+    environment:
+      - TZ=Asia/Jerusalem
+    tty: true
+    cap_add:
+      - NET_ADMIN
+
+  webz-003:
+    build: 
+      context: ./webz-003
+      dockerfile: Dockerfile  
+    container_name: webz-003
+    hostname: webz-003
+    networks:
+      cluster_net:
+        ipv4_address: 172.20.0.4
+    privileged: true
+  
+    environment:
+      - TZ=Asia/Jerusalem
+    tty: true
+    cap_add:
+      - NET_ADMIN
+    
+
+  webz-004:
+    build: 
+      context: ./webz-004
+      dockerfile: Dockerfile  
+    container_name: webz-004
+    hostname: webz-004
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false  
+      - TZ=Asia/Jerusalem
+    volumes:
+      - ./webz-004/jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    tty: true
+    privileged: true
+    networks:
+      cluster_net:
+        ipv4_address: 172.20.0.6
+
+networks:
+  cluster_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  corosync-config:
+    driver: local
+  pcsd-tokens:
+    driver: local

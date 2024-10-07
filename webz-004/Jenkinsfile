@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+    environment {
+        FLOATING_IP = "172.20.0.5"
+        LOG_PATH = "/var/jenkins_home/floating_ip_responses.log"
+    }
+    triggers {
+        cron('H/1 * * * *')
+    }
+    stages {
+        stage('Curl Request') {
+            steps {
+                script {
+
+                    def response = sh(script: "curl -s http://$FLOATING_IP:80", returnStdout: true).trim()
+                    def timestamp = sh(script: "date '+%Y-%m-%d %H:%M:%S'", returnStdout: true).trim()
+
+        
+                    def containerName = sh(script: "curl -s -I http://$FLOATING_IP:80 | grep 'Node-Name' | awk '{print \$2}'", returnStdout: true).trim()
+                    def containerIP = sh(script: "curl -s -I http://$FLOATING_IP:80 | grep 'X-Node-IP' | awk '{print \$2}'", returnStdout: true).trim()
+
+                    def logEntry = "[$timestamp] Container name: $containerName - IP: $containerIP - Response: $response"
+
+                    sh "echo '$logEntry' >> $LOG_PATH"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // Display log file content after each build
+            sh "cat $LOG_PATH"
+        }
+    }
+}
