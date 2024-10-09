@@ -7,12 +7,14 @@ services:
       dockerfile: Dockerfile  
     container_name: webz-001
     hostname: webz-001
+    environment:
+      - TZ=Asia/Jerusalem
+    volumes:
+      - ./cluster_config.txt:/cluster_config.txt
     networks:
       cluster_net:
         ipv4_address: 172.20.0.2
     privileged: true
-    environment:
-      - TZ=Asia/Jerusalem
     tty: true
     cap_add:
       - NET_ADMIN

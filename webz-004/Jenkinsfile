@@ -1,17 +1,30 @@
 pipeline {
     agent any
     environment {
-        FLOATING_IP = "172.20.0.5"
+        FLOATING_IP = 'InitialValue' // Declare a variable to store the floating IP
         LOG_PATH = "/var/jenkins_home/floating_ip_responses.log"
     }
     triggers {
         cron('H/1 * * * *')
     }
     stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from the Git repository
+                git url: 'https://github.com/tomernos/high-availability-cluster.git', branch: 'main'
+            }
+        }
+        stage('Retrieve Floating IP') {
+            steps {
+                script {
+                    FLOATING_IP = sh(script: "grep 'Floating_IP' cluster_config.txt | awk -F ': ' '{print $2}' | tr -d '\" ,'", returnStdout: true).trim()
+                    echo "Retrieved Floating IP: ${FLOATING_IP}"
+                }
+            }
+        }
         stage('Curl Request') {
             steps {
                 script {
-
                     def response = sh(script: "curl -s http://$FLOATING_IP:80", returnStdout: true).trim()
                     def timestamp = sh(script: "date '+%Y-%m-%d %H:%M:%S'", returnStdout: true).trim()
 

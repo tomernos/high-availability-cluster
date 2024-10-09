@@ -10,9 +10,8 @@ if [ ! -f /pcs_configured ]; then
   /setup_cluster.sh
 fi
 
-
-# Run MySQL setup script
-#/setup_mysql.sh
+# generate cluster config
+/generate_config.sh
 
 # Run Apache2 start script
 /start_apache.sh 

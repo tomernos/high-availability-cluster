@@ -9,9 +9,8 @@ RUN apt-get update && \
 
 COPY scripts/entrypoint.sh /entrypoint.sh
 COPY config/corosync.conf /etc/corosync/corosync.conf
-COPY scripts/setup_mysql.sh /setup_mysql.sh
 COPY scripts/start_apache.sh /start_apache.sh
-RUN chmod +x /entrypoint.sh /setup_mysql.sh /start_apache.sh
+RUN chmod +x /entrypoint.sh /start_apache.sh
 RUN chmod +x /start_apache.sh
 
 EXPOSE 80 3306 2224
